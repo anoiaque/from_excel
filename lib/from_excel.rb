@@ -1,3 +1,5 @@
 require 'nokogiri'
 require 'roo'
+require 'rubygems'
+require 'active_support/inflector'
 require 'excel_import'

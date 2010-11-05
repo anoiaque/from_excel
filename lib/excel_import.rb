@@ -32,11 +32,27 @@ module ExcelImport
   
   class Mapping
     
+    attr_accessor :map, :has_one_associations
+    
     def initialize sheet, map, bounds
       @map = map
       @sheet = sheet
       @bounds = bounds 
       @map ? indexation : default
+      @has_one_associations = extract_has_one_associations
+    end
+    
+    def extract_has_one_associations
+      @map.inject({}) do |associations, (attribute, index)|
+        next(associations) unless attribute.is_a?(Array)
+        association = attribute.first
+        next(associations) if associations.has_key?(association)
+        associations.merge({association => klass_of(association)})
+      end
+    end
+    
+    def attributes_of association
+      @map.select {|attribute,| attribute.is_a?(Array) && attribute.first == association}
     end
     
     def indexation
@@ -66,6 +82,12 @@ module ExcelImport
     def self.default_attribute_for column_name
       column_name.downcase.gsub(' ', '_').to_sym
     end
+    
+    private
+    
+    def klass_of attribute
+      attribute.to_s.camelize.constantize 
+    end
  
   end
  
@@ -75,19 +97,47 @@ module ExcelImport
       @sheet = sheet
       @klass = klass
       @bounds = Bounds.new(sheet, options)
+      @rules = options[:rules]
       @mapping = Mapping.new(sheet, options[:mapping], @bounds)
     end
-
-    def row_to_hash row_index
-      @bounds.first_column.upto(@bounds.last_column).inject({}) do |hash, column_index|
-        attribute =  @mapping.attribute(column_index)
-        hash[attribute] = @sheet.cell(row_index, column_index)
+    
+    def cell_value_with_rule row_index, column_index
+      @sheet.cell(row_index, column_index)
+    end
+    
+    def primary_attributes_hash row_index
+      @mapping.map.select{|attribute,| attribute.is_a? Symbol}.inject({}) do |hash, (attribute, index)|
+        hash[attribute] = cell_value_with_rule(row_index, index)
         hash
       end
     end
     
+    def object_from_columns_for_association association, row_index, klass
+      attributes = @mapping.attributes_of(association)
+      attributes.inject(klass.new) do |object, ((association, attribute), index)|
+        p association
+        p attribute
+        p index
+        association_attribute = attribute
+        object.send(association_attribute.to_s + '=', cell_value_with_rule(row_index, @mapping.map[attribute]))
+        object
+      end
+    end
+    
+    def has_one_associations_attributes_hash row_index
+      @mapping.has_one_associations.inject({}) do |hash, (association, klass)|
+        hash[association] = object_from_columns_for_association(association, row_index, klass)
+        hash
+      end
+    end
+    
+    def row_to_hash row_index
+      hash = primary_attributes_hash(row_index)
+      hash.merge(has_one_associations_attributes_hash row_index)
+    end
+    
     def rows_to_objects
-     @bounds.first_row.upto(@bounds.last_row).inject([]) {|objects, row_index| objects << @klass.new(row_to_hash(row_index)); objects}
+      @bounds.first_row.upto(@bounds.last_row).inject([]) {|objects, row_index| objects << @klass.new(row_to_hash(row_index)); objects}
     end
     
   end
