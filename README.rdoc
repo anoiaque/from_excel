@@ -36,17 +36,15 @@ options :
  :mapping => hash mapping attribute <=> <column name or column index>
  :title => true|false . Pass false to indicate that columns have no title. True by default.
  :limits => :start => [first_row, first_column], :end => [last_row, last_column]
- :rules => Procs rules to convert data in cell sheet to desired data for object attribute.
- For example, transform a string to association id (see example below)
+ :rules => Procs rules to convert data in cell sheet to desired data for object attribute.For example, transform a string to association id (see example below)
  
 
-<b>Note: If columns have title, by default the row of columns titles is supposed to be the first row before the first row
-of data which will be convert to ruby object.</b>
+<b>Note</b>: If columns have title, by default the row of columns titles is supposed to be the first row before the first row of data which will be converted to ruby object.
  
 == Basic spreadsheet 
 
 Suppose you have this kind of Excel sheet:
-      A           B         C
+      A               B         C
    1 First name	Last name	 Age
    2 Albert	    Einstein	 131
    3 Leonard	  De Vinci	 558
@@ -66,16 +64,20 @@ You get theses users :
     User.new(:first_name => 'Martin', :last_name =>	'Heidegger', :age => 121)]
    
 By default, attributes model are retrieved from columns title with the following simple rule :
+
 o spaces are converted to "_"
+
 o words are downcased
    
-   First Name => :first_name
-   Last Name => :last_name
+First Name => :first_name
+
+Last Name => :last_name
       
 
 == Mapping attribute - column names
   
-If a column name can't be simply mapped to attribute model, you can pass a map to.    
+If a column name can't be simply mapped to attribute model, you can pass a map to.   
+ 
 If, with the last spreadsheet example, "First name" column had "Prenom" instead as title and you want this column
 to map :first_name attribute of User model, do like this :
 
@@ -84,7 +86,9 @@ to map :first_name attribute of User model, do like this :
 == Spreadsheet whithout columns title
 
 Suppose your spreadsheet has no columns title.
+
 You can then map columns <=> model attribute via index of column.
+
 You can also pass the starting cell of data (the first cell of data (excluded title when there is one))
 
    users = User.from_excel sheet,  :mapping => {:first_name => 1, :last_name => 2, :age => 3}, :limits => {:start => [2, 1]}
@@ -102,8 +106,8 @@ If not, you must pass a mapping with :attribute => column_index
 
 Suppose user has one adress of class Adress(:street, :town, :zip_code)
 And you have this spreadsheet :
-        A            B            C      D                  E     F
-  1  First name	Last name	     Age	    Street	          Town	   Zip Code
+        A            B                 C                D                  E                 F
+  1  First name	Last name	     Age	    Street	          Town	         Zip Code
   2  Albert	     Einstein	     131	    17 rue de Brest	  Quimper	 29000
 So, you want user with user.adress = Adress.new(:stret => ..., :town => ... , :zip_code => ....)
 Just pass the following mapping :
