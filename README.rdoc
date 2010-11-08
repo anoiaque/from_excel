@@ -106,9 +106,9 @@ If not, you must pass a mapping with :attribute => column_index
 
 Suppose user has one adress of class Adress(:street, :town, :zip_code)
 And you have this spreadsheet :
-        A            B                 C                D                  E                 F
-  1  First name	Last name	     Age	    Street	          Town	         Zip Code
-  2  Albert	     Einstein	     131	    17 rue de Brest	  Quimper	 29000
+        A               B                 C                D                  E                 F
+  1  First name	     Last name	          Age	        Street	             Town	       Zip Code
+  2  Albert	     Einstein	         131	        17 rue de Brest	     Quimper	       29000
 So, you want user with user.adress = Adress.new(:stret => ..., :town => ... , :zip_code => ....)
 Just pass the following mapping :
 
