@@ -1,7 +1,8 @@
 == Overview
 
- Import excel spreadsheet rows to ruby objects.
- For how to use it, see examples below or see unit tests
+Import excel spreadsheet rows to ruby objects.
+
+For how to use it, see examples below or see unit tests
 
 == Install
 
