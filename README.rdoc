@@ -11,9 +11,13 @@ For how to use it, see examples below or see unit tests
 == Dependencies
 
 gem 'nokogiri'
+
 gem 'roo'
+
 gem 'rubyzip'
+
 gem 'spreadsheet'
+
 gem 'google-spreadsheet-ruby'
 
 (also require 'active_support/inflector')
