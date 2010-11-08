@@ -90,6 +90,22 @@ module ExcelImport
     end
  
   end
+  
+  class Rules
+    
+    def initialize rules
+      @rules = rules || {}
+    end
+    
+    def for attribute
+      @rules[attribute] || default
+    end
+    
+    def default
+      lambda {|value| value}
+    end
+    
+  end
  
   class Integrator
     
@@ -97,17 +113,17 @@ module ExcelImport
       @sheet = sheet
       @klass = klass
       @bounds = Bounds.new(sheet, options)
-      @rules = options[:rules]
+      @rules = Rules.new(options[:rules])
       @mapping = Mapping.new(sheet, options[:mapping], @bounds)
     end
     
-    def cell_value_with_rule row_index, column_index
-      @sheet.cell(row_index, column_index)
+    def cell_value row_index, column_index
+      @rules.for(@mapping.attribute(column_index)).call(@sheet.cell(row_index, column_index))
     end
     
     def primary_attributes_hash row_index
       @mapping.map.select{|attribute,| attribute.is_a? Symbol}.inject({}) do |hash, (attribute, index)|
-        hash[attribute] = cell_value_with_rule(row_index, index)
+        hash[attribute] = cell_value(row_index, index)
         hash
       end
     end
@@ -115,11 +131,7 @@ module ExcelImport
     def object_from_columns_for_association association, row_index, klass
       attributes = @mapping.attributes_of(association)
       attributes.inject(klass.new) do |object, ((association, attribute), index)|
-        p association
-        p attribute
-        p index
-        association_attribute = attribute
-        object.send(association_attribute.to_s + '=', cell_value_with_rule(row_index, @mapping.map[attribute]))
+        object.send(attribute.to_s + '=', cell_value(row_index, index))
         object
       end
     end

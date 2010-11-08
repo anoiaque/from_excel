@@ -1,0 +1,168 @@
+== Overview
+
+Import excel spreadsheet rows to ruby objects.
+For how to use it, see examples below or see unit tests
+
+== Install
+
+  gem install from_excel
+
+== Dependencies
+
+gem 'nokogiri'
+gem 'roo'
+gem 'rubyzip'
+gem 'spreadsheet'
+gem 'google-spreadsheet-ruby'
+
+(also require 'active_support/inflector')
+
+== Usage
+
+data = Model.from_excel(spreadsheet_file, options)
+
+Include module in your model : include ExcelImport
+
+
+ 
+spreadsheet_file : File object as spreadsheet (ie :File.new ("path_to_spreadsheet"))
+ 
+options :
+ :mapping => hash mapping attribute <=> <column name or column index>
+ :title => true|false . Pass false to indicate that columns have no title. True by default.
+ :limits => :start => [first_row, first_column], :end => [last_row, last_column]
+ :rules => Procs rules to convert data in cell sheet to desired data for object attribute.
+ For example, transform a string to association id (see example below)
+ 
+
+<b>Note: If columns have title, by default the row of columns titles is supposed to be the first row before the first row
+of data which will be convert to ruby object.</b>
+ 
+== Basic spreadsheet 
+
+Suppose you have this kind of Excel sheet:
+      A           B         C
+   1 First name	Last name	 Age
+   2 Albert	    Einstein	 131
+   3 Leonard	  De Vinci	 558
+   
+and a class:
+
+   User (:first_name, last_name, :age)
+
+You can retrieve users, the simple way like that :
+
+   users = User.from_excel(File.new ("path_to_spreadsheet"))
+   
+You get theses users :
+  
+   [User.new(:first_name => 'Albert', :last_name =>	'Einstein', :age => 131),
+    User.new(:first_name => 'Leonard', :last_name =>	'De Vinci', :age => 558),
+    User.new(:first_name => 'Martin', :last_name =>	'Heidegger', :age => 121)]
+   
+By default, attributes model are retrieved from columns title with the following simple rule :
+o spaces are converted to "_"
+o words are downcased
+   
+   First Name => :first_name
+   Last Name => :last_name
+      
+
+== Mapping attribute - column names
+  
+If a column name can't be simply mapped to attribute model, you can pass a map to.    
+If, with the last spreadsheet example, "First name" column had "Prenom" instead as title and you want this column
+to map :first_name attribute of User model, do like this :
+
+   users = User.from_excel sheet, :mapping => {:first_name => 'Prenom'}
+
+== Spreadsheet whithout columns title
+
+Suppose your spreadsheet has no columns title.
+You can then map columns <=> model attribute via index of column.
+You can also pass the starting cell of data (the first cell of data (excluded title when there is one))
+
+   users = User.from_excel sheet,  :mapping => {:first_name => 1, :last_name => 2, :age => 3}, :limits => {:start => [2, 1]}
+
+== Limits : Extraction of part of the spreadsheet
+
+If you want to extract just a part of the spreadsheet, just pass start and end limits.
+   users = User.from_excel(sheet, :limits => {:start => [3, 3], :end => [5, 5] })
+
+<b>Note</b> : The row which contains the columns titles (for default attributes mapping) is, here, supposed to be begining
+at [2,3] and end at [2,5] (one row before the first row of data).
+If not, you must pass a mapping with :attribute => column_index
+
+== Object associations handling
+
+Suppose user has one adress of class Adress(:street, :town, :zip_code)
+And you have this spreadsheet :
+        A            B            C      D                  E     F
+  1  First name	Last name	     Age	    Street	          Town	   Zip Code
+  2  Albert	     Einstein	     131	    17 rue de Brest	  Quimper	 29000
+So, you want user with user.adress = Adress.new(:stret => ..., :town => ... , :zip_code => ....)
+Just pass the following mapping :
+
+  mapping = {[:adress, :street] => 'Street', [:adress, :town] => 'Town', [:adress, :zip_code] => 'Zip Code'}
+
+  users = User.from_excel sheet, :mapping => mapping
+
+And you will get :
+
+   users.first.first_name => 'Albert'
+   users.first.adress.street => '17 rue de Brest'
+  
+   users.first.adress => Adress.new(:street => '17 rue de Brest', :town => 'Quimper' .....)
+  
+== Rules 
+
+
+Suppose you have to transform value of cells column to value for your object attribute, make a rule!
+
+For example, in the sheet you have a value that represents an association attribute id:
+You have roles predifined in your database :
+ Roles :
+  id : 1 , name => 'Admin'
+  id : 2 , name => 'Reader' ....
+
+  Sheet :
+
+    First name	Last name	Rôle
+    Bobby	      Lapointe	Admin
+    Gaston	     Lagaffe	Reader
+
+  
+'Admin' value must be retrieved as a Role with id 1 
+Make the rules like that :
+
+  rules = {[:role, :id] => rule}
+
+Where rule is a Proc.
+
+  mapping = {[:role, :id] => 'Rôle'}
+  rules = {[:role, :id] => rule}
+  users = User.from_excel sheet, :mapping => mapping, :rules => rules
+
+
+  def rule
+    lambda do |cell_value|
+      case cell_value
+      when 'Admin' then 1
+      when 'Reader' then 2
+      end
+    end
+  end
+  
+  
+That's it !
+You get user.first.role => Role(:id => 1) 
+   
+You may use rules for other purpose. Rule proc aim to transform value sheet cell to value you need for
+your model.
+   
+   
+
+== TO DO
+
+Option for other spreadsheet than Excel (LibreOffice ...)
+Handle has_many associations
