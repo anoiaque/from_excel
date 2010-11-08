@@ -136,9 +136,9 @@ You have roles predifined in your database :
 
   Sheet :
 
-    First name	Last name	Rôle
-    Bobby	      Lapointe	Admin
-    Gaston	     Lagaffe	Reader
+    First name	       Last name	    Rôle
+    Bobby	        Lapointe	  Admin
+    Gaston	        Lagaffe	          Reader
 
   
 'Admin' value must be retrieved as a Role with id 1 
