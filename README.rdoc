@@ -35,11 +35,12 @@ spreadsheet_file : File object as spreadsheet (ie :File.new ("path_to_spreadshee
 options :
  :mapping => hash mapping attribute <=> <column name or column index>
  :title => true|false . Pass false to indicate that columns have no title. True by default.
+ :offset_from_title. First row offset from title 
  :limits => :start => [first_row, first_column], :end => [last_row, last_column]
  :rules => Procs rules to convert data in cell sheet to desired data for object attribute.For example, transform a string to association id (see example below)
  
 
-<b>Note</b>: If columns have title, by default the row of columns titles is supposed to be the first row before the first row of data which will be converted to ruby object.
+<b>Note</b>: If columns have title, by default the row of columns titles is supposed to be the first row before the first row of data which will be converted to ruby object.To change it, pass :offset_from_title => <offset>
  
 == Basic spreadsheet 
 
