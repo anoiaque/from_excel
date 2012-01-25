@@ -157,9 +157,26 @@ module ExcelImport
   def self.included(base)
     class << base
       def from_excel spreadsheet, opt={}
-        integrator = Integrator.new(Excel.new(spreadsheet.path), self, opt)
+        from_spreadsheet(:xls, spreadsheet, opt)
+      end
+      
+      def from_ooo spreadsheet, opt={}
+        from_spreadsheet(:ods, spreadsheet, opt)
+      end
+      
+      private
+      
+      def from_spreadsheet type, spreadsheet, opt={}
+        klass = case type
+        when :ods 
+          Openoffice
+        when :xls 
+          Excel
+        end
+        integrator = Integrator.new(klass.new(spreadsheet.path), self, opt)
         integrator.rows_to_objects
       end
+      
     end
   end
   

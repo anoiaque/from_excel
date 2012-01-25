@@ -1,11 +1,11 @@
 specifications = Gem::Specification.new do |spec| 
   spec.name = "from_excel"
-  spec.version = "1.0.1"
+  spec.version = "1.1.0"
   spec.author = "Philippe Cantin"
   spec.homepage = "http://github.com/anoiaque/from_excel"
   spec.platform = Gem::Platform::RUBY
-  spec.summary = "Import Excel spreadsheet to ruby objects"
-  spec.description = "Import Excel spreadsheet to ruby objects"
+  spec.summary = "Import Excel & OpenOffice spreadsheet to ruby objects"
+  spec.description = "Import Excel & OpenOffice spreadsheet to ruby objects"
   spec.files = Dir['lib/**/*.rb']
   spec.require_path = "lib"
   spec.add_dependency("roo")
