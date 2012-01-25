@@ -1,6 +1,6 @@
 specifications = Gem::Specification.new do |spec| 
   spec.name = "from_excel"
-  spec.version = "1.0.0"
+  spec.version = "1.0.1"
   spec.author = "Philippe Cantin"
   spec.homepage = "http://github.com/anoiaque/from_excel"
   spec.platform = Gem::Platform::RUBY
