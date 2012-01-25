@@ -8,7 +8,6 @@ specifications = Gem::Specification.new do |spec|
   spec.description = "Import Excel spreadsheet to ruby objects"
   spec.files = Dir['lib/**/*.rb']
   spec.require_path = "lib"
-  spec.add_dependency("nokogiri")
   spec.add_dependency("roo")
   spec.test_files  = Dir['test/**/*.rb']
   spec.has_rdoc = false
