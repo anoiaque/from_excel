@@ -1,6 +1,9 @@
 == Overview
 
-Import excel spreadsheet rows to ruby objects.
+Import Excel and OpenOffice spreadsheet rows to ruby objects.
+
+For excel : .from_excel
+For open office : .from_ooo
 
 For how to use it, see examples below or see unit tests
 
@@ -174,5 +177,5 @@ your model.
 
 == TO DO
 
-Option for other spreadsheet than Excel (LibreOffice ...)
+Option for other spreadsheets
 Handle has_many associations
