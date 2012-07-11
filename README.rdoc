@@ -7,6 +7,10 @@ For open office : .from_ooo
 
 For how to use it, see examples below or see unit tests
 
+== Quality Metrics
+
+{<img src="https://codeclimate.com/badge.png" />}[https://codeclimate.com/github/anoiaque/from_excel]
+
 == Install
 
   gem install from_excel
